@@ -1,0 +1,31 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd
+http://maven.apache.org/ASSEMBLY/2.0.0 ">
+    <id>distribution</id>
+    <!-- 输出格式 -->
+    <formats>
+        <format>jar</format>
+    </formats>
+    <!-- 指定文件组的组装方式 -->
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <!-- 将项目中src/main/bin目录下的脚本文件copy到target目录的bin目录下 -->
+        <fileSet>
+            <directory>target/classes</directory>
+            <outputDirectory>.</outputDirectory>
+            <excludes>
+                <exclude>log4j.properties</exclude>
+            </excludes>
+        </fileSet>
+    </fileSets>
+    <dependencySets>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>.</outputDirectory>
+            <!-- 只包含runtime作用域的依赖 -->
+            <scope>compile</scope>
+            <unpack>true</unpack>
+        </dependencySet>
+    </dependencySets>
+</assembly>
