@@ -1,0 +1,21 @@
+FORM java:lastest
+
+MAINTAINER xiazhonghai <811652521@qq.com>
+
+RUN mkdir -p /var/lib/omkafka
+
+WORKDIR /var/lib/omkafka
+
+RUN wget https://mirror-hk.koddos.net/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz && \
+    	tar -xzvf apache-maven-3.6.3-bin.tar.gz
+
+ENV MAVEN_HOEM=/var/lib/om-webserver/apache-maven-3.6.3
+
+ENV PATH=$MAVEN_HOEM/bin:$PATH
+
+RUN git clone https://gitee.com/bigseacoming/om-kafka.git && \
+	cd om-webserver && \
+	mvn clean install  -Dmaven.test.skip && \
+	mv ./target/omkafka-1.0-SNAPSHOT.jar ../om-kafka.jar
+
+CMD java -jar om-kafka.jar

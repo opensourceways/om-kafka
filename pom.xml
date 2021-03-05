@@ -109,7 +109,7 @@
             <appendAssemblyId>false</appendAssemblyId>
             <archive>
               <manifest>
-                <mainClass>om.QualityDashboard</mainClass>
+                <mainClass>om.Main</mainClass>
               </manifest>
             </archive>
             <descriptorRefs>
