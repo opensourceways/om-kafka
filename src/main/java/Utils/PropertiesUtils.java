@@ -1,5 +1,6 @@
 package Utils;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -15,7 +16,7 @@ public class PropertiesUtils {
         synchronized (Properties.class){
             if(properties==null){
                 properties=new Properties();
-                InputStream resourceAsStream = PropertiesUtils.class.getClassLoader().getResourceAsStream("conf.properties");
+                InputStream resourceAsStream = new FileInputStream(System.getProperty("user.dir") +"/conf.properties");
                 properties.load(resourceAsStream);
             }
         }
