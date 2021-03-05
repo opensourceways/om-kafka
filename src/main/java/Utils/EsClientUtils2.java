@@ -55,6 +55,7 @@ public class EsClientUtils2 {
             @Override
             public void beforeBulk(long executionId, BulkRequest request) {
                 logger.info(String.format("before push  %s request", request.numberOfActions()));
+                System.out.println(String.format("before push  %s request", request.numberOfActions()));
             }
 
             @Override
@@ -105,25 +106,26 @@ public class EsClientUtils2 {
                     .setBulkSize(new ByteSizeValue(5L, ByteSizeUnit.MB))
                     // 并发请求数量, 0不并发, 1并发允许执行
                     .setConcurrentRequests(1)
-                    // 固定1s必须刷新一次
-                    .setFlushInterval(TimeValue.timeValueSeconds(1L))
+                    // 固定5s必须刷新一次
+                    .setFlushInterval(TimeValue.timeValueSeconds(5L))
                     // 重试5次，间隔1s
                     .setBackoffPolicy(BackoffPolicy.constantBackoff(TimeValue.timeValueSeconds(1L), 5))
                     .build();
         }
         return build;
     }
+
     public static void insertOrUpdate(String index, String id, Map data) throws IOException {
         UpdateRequest updateRequest = new UpdateRequest(index, id);
         updateRequest.doc(data);
         updateRequest.upsert(data);
         try {
-            UpdateResponse update = getClient().update(updateRequest, RequestOptions.DEFAULT);
-        }catch (Exception e){
-            //todo 连接超时，失败是重试策略
-            e.printStackTrace();
+            BulkProcessor add = getBulkProcess().add(updateRequest);
+        } catch (Exception e) {
+            logger.error(e.getMessage() + data, e);
         }
     }
+
     public static SSLContext skipSsl() throws NoSuchAlgorithmException, KeyManagementException {
         SSLContext sc = SSLContext.getInstance("SSL");
 
@@ -132,13 +134,13 @@ public class EsClientUtils2 {
             @Override
             public void checkClientTrusted(
                     java.security.cert.X509Certificate[] paramArrayOfX509Certificate,
-                    String paramString) throws CertificateException {
+                    String paramString) {
             }
 
             @Override
             public void checkServerTrusted(
                     java.security.cert.X509Certificate[] paramArrayOfX509Certificate,
-                    String paramString) throws CertificateException {
+                    String paramString) {
             }
 
             @Override

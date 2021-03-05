@@ -33,6 +33,7 @@ public class EsClientUtils {
             @Override
             public void beforeBulk(long executionId, BulkRequest request) {
                 logger.info(String.format("before push  %s request", request.numberOfActions()));
+                String.format("before push  %s request", request.numberOfActions());
             }
 
             @Override

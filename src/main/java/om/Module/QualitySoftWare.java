@@ -5,13 +5,18 @@ import CommonClass.Parent;
 import Utils.EsClientUtils2;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import om.QualityDashboard;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author xiazhonghai
@@ -19,7 +24,7 @@ import java.util.*;
  * @description:
  */
 public class QualitySoftWare extends Parent implements CommonInterface {
-
+    private static Logger logger = LogManager.getLogger(QualitySoftWare.class);
     public QualitySoftWare() throws IOException {
     }
     private static ObjectMapper objectMapper=new ObjectMapper();
@@ -36,10 +41,15 @@ public class QualitySoftWare extends Parent implements CommonInterface {
                         try {
                             EsClientUtils2.insertOrUpdate(esIndex, id, map);
                         } catch (IOException e) {
-                            e.printStackTrace();
-                            //todo 失败处理策略
+                            try {
+                                logger.error(e+":"+objectMapper.writeValueAsString(map),e);
+                            } catch (JsonProcessingException jsonProcessingException) {
+                                jsonProcessingException.printStackTrace();
+                                logger.error(jsonProcessingException+":"+map,jsonProcessingException);
+                            }
                         }
                     }
+                    EsClientUtils2.getBulkProcess().flush();
                     customer.commitSync();
                 }
             };
@@ -75,7 +85,7 @@ public class QualitySoftWare extends Parent implements CommonInterface {
                 resutList.add(map);
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
-                //todo json格式化异常处理
+                logger.error(e.getMessage()+":"+value,e);
             }
         }
         return resutList;
