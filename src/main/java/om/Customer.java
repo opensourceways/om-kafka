@@ -41,21 +41,22 @@ import static Utils.EsClientUtils.skipSsl;
  * @description:
  */
 public class Customer extends Thread {
-    private List<TopicPartition> topicPartitions=new ArrayList<>();
+    private List<TopicPartition> topicPartitions = new ArrayList<>();
     private Properties conf;
     private KafkaConsumer kafkaConsumer;
     private CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-    private  Logger logger = LogManager.getLogger(QualityDashboard.class);
-    private  Logger loggeroffset ;
-    private RestHighLevelClient client ;
-    private String esindex ;
+    private Logger logger = LogManager.getLogger(QualityDashboard.class);
+    private Logger loggeroffset;
+    private RestHighLevelClient client;
+    private String esindex;
 
     @Override
-    public void run() {
+    public void
+    run() {
         while (true) {
             ConsumerRecords data = kafkaConsumer.poll(10);
             try {
-                if(data.count()>0){
+                if (data.count() > 0) {
                     dealSoftWaredata(data);
                 }
             } catch (JsonProcessingException e) {
@@ -72,16 +73,17 @@ public class Customer extends Thread {
         this.conf = conf;
         kafkaConsumer = new KafkaConsumer(this.conf);
     }
-    public Customer(TopicPartition topicPartition, Properties conf, String name,int offset,Logger logger) {
+
+    public Customer(TopicPartition topicPartition, Properties conf, String name, int offset, Logger logger) {
         super(name);
-        this.loggeroffset=logger;
+        this.loggeroffset = logger;
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(conf.get("es.user").toString(), conf.get("es.password").toString()));
         this.topicPartitions.add(topicPartition);
         this.conf = conf;
         kafkaConsumer = new KafkaConsumer(this.conf);
         kafkaConsumer.assign(this.topicPartitions);
-        kafkaConsumer.seek(topicPartition,offset);
-        client= new RestHighLevelClient(
+        kafkaConsumer.seek(topicPartition, offset);
+        client = new RestHighLevelClient(
                 RestClient.builder(
                         new HttpHost(conf.get("es.host").toString(), Integer.parseInt(conf.get("es.port").toString()), conf.get("es.scheme").toString())
                 ).setHttpClientConfigCallback(httpAsyncClientBuilder -> {
@@ -94,7 +96,7 @@ public class Customer extends Thread {
                     }
                     return httpAsyncClientBuilder.setSSLContext(sc);
                 }));
-        esindex= conf.get("es.index").toString();
+        esindex = conf.get("es.index").toString();
     }
 
     public void dealSoftWaredata(ConsumerRecords<String, String> datas) throws JsonProcessingException {
@@ -104,7 +106,7 @@ public class Customer extends Thread {
             try {
                 Map datamap = mapper.readValue(data.value(), Map.class);
                 //更新以前旧数据
-                if("succeeded".equals(datamap.get("code").toString())){
+                if ("succeeded".equals(datamap.get("code").toString())) {
                     String packagename = datamap.get("package").toString();
                     String hostarch = datamap.get("hostarch").toString();
                     String project = datamap.get("project").toString();
@@ -117,9 +119,9 @@ public class Customer extends Thread {
                 //设置此条数据为这个包下的最新数据
                 datamap.put("is_latest_record_by_packagename", 1);
                 String workerid = datamap.get("workerid").toString();
-                if(workerid !=null){
-                    String newworkerid=workerid.split(":")[0];
-                    datamap.put("abbrworkerid",newworkerid);
+                if (workerid != null) {
+                    String newworkerid = workerid.split(":")[0];
+                    datamap.put("abbrworkerid", newworkerid);
                 }
                 bulkProcess.add(new IndexRequest(esindex).id(datamap.get("created_at").toString() + datamap.get("package").toString() + datamap.get("bcnt")).source(datamap));
                 loggeroffset.info("partition-" + data.partition() + "-offset-" + data.offset());

@@ -46,6 +46,7 @@ public class QualityDashboard {
 
         }
 
+
         ArrayList<Customer> customerThreads = new ArrayList();
         for (Map.Entry<String, String> stringStringEntry : offsetMap.entrySet()) {
             String partitionnum = stringStringEntry.getKey();
