@@ -15,7 +15,7 @@ ENV PATH=$MAVEN_HOEM/bin:$PATH
 
 RUN git clone https://gitee.com/bigseacoming/om-kafka.git && \
 	cd om-webserver && \
-	mvn clean install  -Dmaven.test.skip && \
+	mvn clean install assembly:single  -Dmaven.test.skip && \
 	mv ./target/omkafka-1.0-SNAPSHOT.jar ../om-kafka.jar
 
 CMD java -jar om-kafka.jar
