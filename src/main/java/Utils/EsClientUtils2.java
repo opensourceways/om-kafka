@@ -6,6 +6,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.nio.conn.ssl.SSLIOSessionStrategy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.bulk.BackoffPolicy;
@@ -21,9 +22,7 @@ import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -60,12 +59,14 @@ public class EsClientUtils2 {
 
             @Override
             public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
-
+                logger.info(String.format("after push  %s request", request.numberOfActions()));
+                System.out.println(String.format("after push  %s request", request.numberOfActions()));
             }
 
             @Override
             public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
-
+                logger.info(String.format("error push  %s request", request.numberOfActions()));
+                System.out.println(String.format("error push  %s request", request.numberOfActions()));
             }
         };
         return listener;
@@ -74,6 +75,7 @@ public class EsClientUtils2 {
     public static synchronized RestHighLevelClient getClient() throws IOException {
         if (client == null) {
             client = new RestHighLevelClient(
+
                     RestClient.builder(
                             new HttpHost(PropertiesUtils.readProperties().get("es.host").toString(), Integer.parseInt(PropertiesUtils.readProperties().get("es.port").toString()), PropertiesUtils.readProperties().get("es.scheme").toString())
                     ).setHttpClientConfigCallback(httpAsyncClientBuilder -> {
@@ -84,6 +86,8 @@ public class EsClientUtils2 {
                         } catch (NoSuchAlgorithmException | KeyManagementException e) {
                             e.printStackTrace();
                         }
+                        httpAsyncClientBuilder.setSSLContext(sc);
+                        httpAsyncClientBuilder.setSSLHostnameVerifier((s, sslSession) -> true);
                         return httpAsyncClientBuilder.setSSLContext(sc);
                     }));
         }
