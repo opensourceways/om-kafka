@@ -124,13 +124,14 @@ public class EsClientUtils2 {
         Object offset = data.remove("offset");
         Object partition = data.remove("partition");
         Logger logger = LogManager.getLogger("offset" + partition);
-        logger.info("offset");
+        logger.info("partation:"+partition+":offset:"+offset);
         updateRequest.doc(data);
         updateRequest.upsert(data);
         try {
             BulkProcessor add = getBulkProcess().add(updateRequest);
         } catch (Exception e) {
             EsClientUtils2.logger.error(offset+e.getMessage() + data, e);
+            logger.error("partation:"+partition+":offset:"+offset);
         }
     }
 
