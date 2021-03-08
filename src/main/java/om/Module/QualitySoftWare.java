@@ -66,6 +66,8 @@ public class QualitySoftWare extends Parent implements CommonInterface {
             String value = record.value();
             try {
                 Map map = objectMapper.readValue(value, Map.class);
+                map.put("offset",record.offset());
+                map.put("partition",record.partition());
                 //获取id
                 String id = (String)map.get("id");
                 if(id==null||id.length()<=0){

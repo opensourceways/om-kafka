@@ -121,12 +121,16 @@ public class EsClientUtils2 {
 
     public static void insertOrUpdate(String index, String id, Map data) throws IOException {
         UpdateRequest updateRequest = new UpdateRequest(index, id);
+        Object offset = data.remove("offset");
+        Object partition = data.remove("partition");
+        Logger logger = LogManager.getLogger("offset" + partition);
+        logger.info("offset");
         updateRequest.doc(data);
         updateRequest.upsert(data);
         try {
             BulkProcessor add = getBulkProcess().add(updateRequest);
         } catch (Exception e) {
-            logger.error(e.getMessage() + data, e);
+            EsClientUtils2.logger.error(offset+e.getMessage() + data, e);
         }
     }
 
