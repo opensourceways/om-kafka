@@ -21,6 +21,13 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
+import org.elasticsearch.index.reindex.UpdateByQueryRequest;
+import org.elasticsearch.script.Script;
 
 import javax.net.ssl.*;
 import java.io.IOException;
@@ -105,11 +112,11 @@ public class EsClientUtils2 {
                 }
             }, getBulkListener())
                     // 1000条数据请求执行一次bulk
-                    .setBulkActions(1000)
+                    .setBulkActions(500)
                     // 5mb的数据刷新一次bfulk
                     .setBulkSize(new ByteSizeValue(5L, ByteSizeUnit.MB))
                     // 并发请求数量, 0不并发, 1并发允许执行
-                    .setConcurrentRequests(1)
+                    .setConcurrentRequests(0)
                     // 固定5s必须刷新一次
                     .setFlushInterval(TimeValue.timeValueSeconds(5L))
                     // 重试5次，间隔1s
@@ -161,4 +168,13 @@ public class EsClientUtils2 {
         sc.init(null, new TrustManager[]{trustManager}, null);
         return sc;
     }
+    public static void updateByQuery(String index, QueryBuilder queryBuilder,Script script) throws IOException {
+        //更新以前旧数据
+
+            UpdateByQueryRequest updateByQueryRequest = new UpdateByQueryRequest(index);
+            updateByQueryRequest.setQuery(queryBuilder);
+            updateByQueryRequest.setScript(script);
+            BulkByScrollResponse updateResponse = getClient().updateByQuery(updateByQueryRequest, RequestOptions.DEFAULT);
+    }
+
 }
