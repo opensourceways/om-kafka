@@ -1,7 +1,5 @@
 FROM java:latest
 
-MAINTAINER xiazhonghai <811652521@qq.com>
-
 RUN mkdir -p /var/lib/om-kafka
 
 WORKDIR /var/lib/om-kafka
@@ -12,6 +10,8 @@ RUN wget https://mirror-hk.koddos.net/apache/maven/maven-3/3.6.3/binaries/apache
 ENV MAVEN_HOEM=/var/lib/om-kafka/apache-maven-3.6.3
 
 ENV PATH=$MAVEN_HOEM/bin:$PATH
+
+MAINTAINER xiazhonghai <811652521@qq.com>
 
 RUN git clone https://gitee.com/bigseacoming/om-kafka.git && \
         cd om-kafka && \
