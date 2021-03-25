@@ -1,7 +1,6 @@
 package test;
 
-import om.QualityDashboard;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
+import om.QualityObs;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
@@ -11,7 +10,6 @@ import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
@@ -35,7 +33,7 @@ public class privider {
     static KafkaProducer<String, String> kafkaProducer;
 
     static {
-        InputStream resourceAsStream = QualityDashboard.class.getClassLoader().getResourceAsStream("conf.properties");
+        InputStream resourceAsStream = QualityObs.class.getClassLoader().getResourceAsStream("conf.properties");
         try {
             conf.load(resourceAsStream);
         } catch (IOException e) {
@@ -48,7 +46,7 @@ public class privider {
     }
 
     public static void main(String[] args) throws ExecutionException, InterruptedException, IOException {
-        RestHighLevelClient client = QualityDashboard.client;
+        RestHighLevelClient client = QualityObs.client;
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         SearchSourceBuilder query = searchSourceBuilder.query(QueryBuilders.matchAllQuery());
         query.size(10000);

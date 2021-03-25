@@ -1,6 +1,7 @@
 package om;
 
 import Utils.EsClientUtils;
+import Utils.EsClientUtils2;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpHost;
@@ -26,6 +27,7 @@ import org.elasticsearch.index.reindex.UpdateByQueryRequest;
 import org.elasticsearch.script.Script;
 
 import javax.net.ssl.SSLContext;
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -45,7 +47,7 @@ public class Customer extends Thread {
     private Properties conf;
     private KafkaConsumer kafkaConsumer;
     private CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-    private Logger logger = LogManager.getLogger(QualityDashboard.class);
+    private Logger logger = LogManager.getLogger(QualityObs.class);
     private Logger loggeroffset;
     private RestHighLevelClient client;
     private String esindex;
@@ -60,6 +62,8 @@ public class Customer extends Thread {
                     dealSoftWaredata(data);
                 }
             } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
@@ -99,8 +103,8 @@ public class Customer extends Thread {
         esindex = conf.get("es.index").toString();
     }
 
-    public void dealSoftWaredata(ConsumerRecords<String, String> datas) throws JsonProcessingException {
-        BulkProcessor bulkProcess = EsClientUtils.getBulkProcess(client);
+    public void dealSoftWaredata(ConsumerRecords<String, String> datas) throws IOException {
+        BulkProcessor bulkProcess = EsClientUtils.getBulkProcess(EsClientUtils2.getClient());
         ObjectMapper mapper = new ObjectMapper();
         for (ConsumerRecord<String, String> data : datas) {
             try {
@@ -114,7 +118,7 @@ public class Customer extends Thread {
                     updateByQueryRequest.setQuery(new TermQueryBuilder("package", packagename));
                     updateByQueryRequest.setQuery(QueryBuilders.boolQuery().must(new TermQueryBuilder("package.keyword", packagename)).must(new TermQueryBuilder("hostarch.keyword", hostarch)).must(new TermQueryBuilder("project.keyword", project)).must(new TermQueryBuilder("is_latest_record_by_packagename", 1)));
                     updateByQueryRequest.setScript(new Script("ctx._source['is_latest_record_by_packagename']=0"));
-                    BulkByScrollResponse updateResponse = client.updateByQuery(updateByQueryRequest, RequestOptions.DEFAULT);
+                    BulkByScrollResponse updateResponse = EsClientUtils2.getClient().updateByQuery(updateByQueryRequest, RequestOptions.DEFAULT);
                 }
                 //设置此条数据为这个包下的最新数据
                 datamap.put("is_latest_record_by_packagename", 1);
@@ -127,6 +131,7 @@ public class Customer extends Thread {
                 loggeroffset.info("partition-" + data.partition() + "-offset-" + data.offset());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
+                e.printStackTrace();
             }
         }
         bulkProcess.flush();

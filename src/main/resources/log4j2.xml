@@ -5,7 +5,7 @@
     </Properties>
 
     <Appenders>
-        <RollingFile name="om.QualityDashboard" fileName="${basePath}/run.log" filePattern="${basePath}/app-info-%d{yyyy-MM-dd}.log">
+        <RollingFile name="om.QualityObs" fileName="${basePath}/run.log" filePattern="${basePath}/app-info-%d{yyyy-MM-dd}.log">
             <PatternLayout>
                 <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n</pattern>
             </PatternLayout>
@@ -59,8 +59,8 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Logger name="om.QualityDashboard" level="info" additivity="false">
-            <appender-ref ref="om.QualityDashboard" level="info" />
+        <Logger name="om.QualityObs" level="info" additivity="false">
+            <appender-ref ref="om.QualityObs" level="info" />
         </Logger>
         <Logger name="om.Module.QualitySoftWare" level="info" additivity="false">
             <appender-ref ref="om.Module.QualitySoftWare" level="error" />

@@ -17,14 +17,14 @@ import java.util.*;
  * @date 2021/1/12 16:41
  * @description:
  */
-public class QualityDashboard {
-    private static Logger logger = LogManager.getLogger(QualityDashboard.class);
+public class QualityObs extends Thread {
+    private static Logger logger = LogManager.getLogger(QualityObs.class);
     static Properties conf = new Properties();
     static KafkaConsumer<String, String> kafkacustomer;
     public static RestHighLevelClient client;
 
     static {
-        InputStream resourceAsStream = QualityDashboard.class.getClassLoader().getResourceAsStream("conf.properties");
+        InputStream resourceAsStream = QualityObs.class.getClassLoader().getResourceAsStream("conf.properties");
         try {
             conf.load(resourceAsStream);
         } catch (IOException e) {
@@ -33,15 +33,19 @@ public class QualityDashboard {
         conf.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         conf.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         kafkacustomer = new KafkaConsumer<String, String>(conf);
-        kafkacustomer.subscribe(Arrays.asList(conf.get("obs.build.topic").toString().split(",")));
+        kafkacustomer.subscribe(Arrays.asList(conf.get("kafka.topic.name").toString().split(",")));
 
     }
 
-    public static void main(String[] args) throws JsonProcessingException, InterruptedException {
+
+    @Override
+    public void run() {
+
         HashMap<String, String> offsetMap = new HashMap<>();
-        List<String> strings = Arrays.asList(args);
-        for (String string : strings) {
-            String[] split = string.split("-");
+        String offsetStr = conf.getProperty("kafka.topic.offset");
+        String[] offsets = offsetStr.split(",");
+        for (String string : offsets) {
+            String[] split = string.split(":");
             offsetMap.put(split[0], split[1]);
 
         }
@@ -51,17 +55,21 @@ public class QualityDashboard {
         for (Map.Entry<String, String> stringStringEntry : offsetMap.entrySet()) {
             String partitionnum = stringStringEntry.getKey();
             String offset = stringStringEntry.getValue();
-            TopicPartition topicPartition = new TopicPartition(conf.getProperty("obs.build.topic").toString(), Integer.parseInt(partitionnum));
+            TopicPartition topicPartition = new TopicPartition(conf.getProperty("kafka.topic.name").toString(), Integer.parseInt(partitionnum));
             Customer customer = new Customer(topicPartition, conf, topicPartition.toString(), Integer.parseInt(offset),LogManager.getLogger("offset"+partitionnum));
             customer.start();
             customerThreads.add(customer);
 
         }
         for (Customer customerThread : customerThreads) {
-            customerThread.join();
+            try {
+                customerThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-
     }
+
 
     /***
      * 功能描述:reset kafka offset
@@ -83,4 +91,5 @@ public class QualityDashboard {
             }
         }
     }
+
 }
