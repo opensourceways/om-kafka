@@ -1,6 +1,6 @@
 package Utils;
 
-import om.QualityDashboard;
+import om.QualityObs;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.bulk.BackoffPolicy;
@@ -26,7 +26,7 @@ import java.security.cert.CertificateException;
  * @description:
  */
 public class EsClientUtils {
-    private static Logger logger=  LogManager.getLogger(QualityDashboard.class);
+    private static Logger logger=  LogManager.getLogger(QualityObs.class);
     public static BulkProcessor.Listener getBulkListener(){
 
         BulkProcessor.Listener listener = new BulkProcessor.Listener() {
