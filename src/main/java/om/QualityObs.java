@@ -1,5 +1,6 @@
 package om;
 
+import Utils.PropertiesUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
@@ -19,16 +20,15 @@ import java.util.*;
  */
 public class QualityObs extends Thread {
     private static Logger logger = LogManager.getLogger(QualityObs.class);
-    static Properties conf = new Properties();
+    static Properties conf;
     static KafkaConsumer<String, String> kafkacustomer;
     public static RestHighLevelClient client;
 
     static {
-        InputStream resourceAsStream = QualityObs.class.getClassLoader().getResourceAsStream("conf.properties");
         try {
-            conf.load(resourceAsStream);
+            conf = PropertiesUtils.readProperties();
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            e.printStackTrace();
         }
         conf.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         conf.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
