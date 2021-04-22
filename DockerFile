@@ -13,7 +13,7 @@ ENV PATH=$MAVEN_HOEM/bin:$PATH
 
 MAINTAINER xiazhonghai <811652521@qq.com>
 
-RUN git clone https://gitee.com/bigseacoming/om-kafka.git && \
+RUN git clone https://gitee.com/lixianlin01/om-kafka.git && \
         cd om-kafka && \
         mvn clean install assembly:single  -Dmaven.test.skip && \
         mv ./target/omkafka-1.0-SNAPSHOT.jar ../om-kafka.jar
