@@ -56,7 +56,7 @@ public class QualityObs extends Thread {
             String partitionnum = stringStringEntry.getKey();
             String offset = stringStringEntry.getValue();
             TopicPartition topicPartition = new TopicPartition(conf.getProperty("kafka.topic.name").toString(), Integer.parseInt(partitionnum));
-            Customer customer = new Customer(topicPartition, conf, topicPartition.toString(), Integer.parseInt(offset),LogManager.getLogger("offset"+partitionnum));
+            Customer customer = new Customer(topicPartition, conf, topicPartition.toString(), Integer.parseInt(offset),LogManager.getLogger("offset"+partitionnum), conf.getProperty("kafka.topic.name"));
             customer.start();
             customerThreads.add(customer);
 
