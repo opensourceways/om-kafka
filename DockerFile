@@ -1,4 +1,4 @@
-FROM java:latest
+FROM java:8
 
 RUN mkdir -p /var/lib/om-kafka
 
