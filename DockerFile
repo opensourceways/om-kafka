@@ -19,3 +19,4 @@ RUN git clone https://gitee.com/opensourceway/om-kafka.git && \
         mv ./target/omkafka-1.0-SNAPSHOT.jar ../om-kafka.jar
 
 CMD java -jar om-kafka.jar
+
