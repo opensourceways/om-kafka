@@ -1,8 +1,12 @@
-FROM java:8
+FROM openjdk:8-jdk
 
 RUN mkdir -p /var/lib/om-kafka
 
 WORKDIR /var/lib/om-kafka
+
+# Install basic software support
+RUN apt-get update && \
+    apt-get install --yes software-properties-common
 
 RUN wget https://mirror-hk.koddos.net/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz && \
         tar -xzvf apache-maven-3.6.3-bin.tar.gz
@@ -19,4 +23,3 @@ RUN git clone https://gitee.com/opensourceway/om-kafka.git && \
         mv ./target/omkafka-1.0-SNAPSHOT.jar ../om-kafka.jar
 
 CMD java -jar om-kafka.jar
-
