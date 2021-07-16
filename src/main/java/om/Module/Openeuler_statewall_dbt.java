@@ -91,6 +91,7 @@ public class Openeuler_statewall_dbt extends Parent implements CommonInterface {
                 Map map = objectMapper.readValue(value, Map.class);
                 map.put("offset", record.offset());
                 map.put("partition", record.partition());
+
                 //获取id much datas has no id in record's in kafka this record's key equals to one record's id which has id field
                 String id = (String) map.get("id");
                 if (id == null || id.length() <= 0) {
@@ -104,29 +105,25 @@ public class Openeuler_statewall_dbt extends Parent implements CommonInterface {
                 String iso_end = (String) map.get("iso_end");
 
 
-                Pattern a= Pattern.compile("^((\\d{2}(([02468][048])|([13579][26]))[\\-\\/\\s]?((((0?[13578])|(1[02]))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(3[01])))|(((0?[469])|(11))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(30)))|(0?2[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])))))|(\\d{2}(([02468][1235679])|([13579][01345789]))[\\-\\/\\s]?((((0?[13578])|(1[02]))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(3[01])))|(((0?[469])|(11))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(30)))|(0?2[\\-\\/\\s]?((0?[1-9])|(1[0-9])|(2[0-8]))))))(\\s((([0-1][0-9])|(2?[0-3]))\\:([0-5]?[0-9])((\\s)|(\\:([0-5]?[0-9])))))?$");
-                Matcher a1=a.matcher(archive_start);
 
-                Pattern b= Pattern.compile("^((\\d{2}(([02468][048])|([13579][26]))[\\-\\/\\s]?((((0?[13578])|(1[02]))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(3[01])))|(((0?[469])|(11))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(30)))|(0?2[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])))))|(\\d{2}(([02468][1235679])|([13579][01345789]))[\\-\\/\\s]?((((0?[13578])|(1[02]))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(3[01])))|(((0?[469])|(11))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(30)))|(0?2[\\-\\/\\s]?((0?[1-9])|(1[0-9])|(2[0-8]))))))(\\s((([0-1][0-9])|(2?[0-3]))\\:([0-5]?[0-9])((\\s)|(\\:([0-5]?[0-9])))))?$");
-                Matcher b1=b.matcher(archive_end);
+                   try {
+                       String create_time = archive_start.replace(" ", "T").concat("+08:00");
+                       map.put("created_at", create_time);
+                       long archive_start_long = LocalDateTime.parse(archive_start.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toEpochSecond(ZoneOffset.of("+8"));
 
-                Pattern c= Pattern.compile("^((\\d{2}(([02468][048])|([13579][26]))[\\-\\/\\s]?((((0?[13578])|(1[02]))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(3[01])))|(((0?[469])|(11))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(30)))|(0?2[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])))))|(\\d{2}(([02468][1235679])|([13579][01345789]))[\\-\\/\\s]?((((0?[13578])|(1[02]))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(3[01])))|(((0?[469])|(11))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(30)))|(0?2[\\-\\/\\s]?((0?[1-9])|(1[0-9])|(2[0-8]))))))(\\s((([0-1][0-9])|(2?[0-3]))\\:([0-5]?[0-9])((\\s)|(\\:([0-5]?[0-9])))))?$");
-                Matcher c1=c.matcher(iso_start);
+                       long archive_end_long = LocalDateTime.parse(archive_end.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toEpochSecond(ZoneOffset.of("+8"));
+                       long iso_start_long = LocalDateTime.parse(iso_start.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toEpochSecond(ZoneOffset.of("+8"));
+                       long iso_end_long = LocalDateTime.parse(iso_end.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toEpochSecond(ZoneOffset.of("+8"));
+                       //添加字段
+                       map.put("software_package_build_duration", archive_end_long - archive_start_long);
+                       map.put("waiting_time", iso_start_long - archive_end_long);
+                       map.put("make_ios_time", iso_end_long - iso_start_long);
+                       map.put("build_version_time", iso_end_long - archive_start_long);
+                   }catch (Exception e){
+                       continue;
+                   }
 
-                Pattern d= Pattern.compile("^((\\d{2}(([02468][048])|([13579][26]))[\\-\\/\\s]?((((0?[13578])|(1[02]))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(3[01])))|(((0?[469])|(11))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(30)))|(0?2[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])))))|(\\d{2}(([02468][1235679])|([13579][01345789]))[\\-\\/\\s]?((((0?[13578])|(1[02]))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(3[01])))|(((0?[469])|(11))[\\-\\/\\s]?((0?[1-9])|([1-2][0-9])|(30)))|(0?2[\\-\\/\\s]?((0?[1-9])|(1[0-9])|(2[0-8]))))))(\\s((([0-1][0-9])|(2?[0-3]))\\:([0-5]?[0-9])((\\s)|(\\:([0-5]?[0-9])))))?$");
-                Matcher d1=d.matcher(iso_end);
-                if(a1.matches() && b1.matches() && c1.matches() && d1.matches()) {
-                    long archive_start_long = LocalDateTime.parse(archive_start.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toEpochSecond(ZoneOffset.of("+8"));
-                    long archive_end_long = LocalDateTime.parse(archive_end.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toEpochSecond(ZoneOffset.of("+8"));
-                    long iso_start_long = LocalDateTime.parse(iso_start.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toEpochSecond(ZoneOffset.of("+8"));
-                    long iso_end_long = LocalDateTime.parse(iso_end.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toEpochSecond(ZoneOffset.of("+8"));
-                    //添加字段
-                    map.put("software_package_build_duration", archive_end_long - archive_start_long);
-                    map.put("waiting_time", iso_start_long - archive_end_long);
-                    map.put("make_ios_time", iso_end_long - iso_start_long);
-                    map.put("build_version_time", iso_end_long - archive_start_long);
-
-                }
+              
 
                 //数值类型转化可以做差
 
