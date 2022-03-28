@@ -67,25 +67,29 @@ public class CiResult extends Parent implements CommonInterface {
         for (ConsumerRecord<String, String> record : records) {
             String key = record.key();
             String value = record.value();
-
+            String id = key;
             try {
                 Map map = objectMapper.readValue(value, Map.class);
                 map.put("offset", record.offset());
                 map.put("partition", record.partition());
+
+                String prUrl = map.get("pr_url").toString();
+                String buildNum = map.get("build_no").toString();
+                String updateAt = map.get("update_at").toString();
+                String updateTime = dateFormat((long)Double.parseDouble(updateAt));
 
                 if (map.containsKey("pr_create_at")) {
                     String prCreateAt = map.get("pr_create_at").toString();
                     String buildAt = map.get("build_at").toString();
                     map.put("pr_create_at", dateFormat((long)Double.parseDouble(prCreateAt)));
                     map.put("build_at", dateFormat((long)Double.parseDouble(buildAt)));
+                    id = DigestUtils.md5Hex(prUrl + buildNum + updateTime);
                 } else if (map.containsKey("commit_at")) {
                     String commitAt = map.get("commit_at").toString();
                     map.put("commit_at", dateFormat((long)Double.parseDouble(commitAt)));
+                    id = DigestUtils.md5Hex(prUrl + buildNum + updateTime + key);
                 }
-
-                String prUrl = map.get("pr_url").toString();
-                String buildNum = map.get("build_no").toString();
-                String id = DigestUtils.md5Hex(prUrl + buildNum);
+                map.put("update_at", updateTime);
 
                 EsClientUtils2.insertOrUpdate(this.esIndex, id, map);
 
