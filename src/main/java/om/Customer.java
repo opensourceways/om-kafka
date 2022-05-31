@@ -107,12 +107,19 @@ public class Customer extends Thread {
 
     public void dealSoftWaredata(ConsumerRecords<String, String> datas) throws IOException {
         BulkProcessor bulkProcess = EsClientUtils.getBulkProcess(EsClientUtils2.getClient());
+        String groupId = kafkaConsumer.groupMetadata().groupId();
         ObjectMapper mapper = new ObjectMapper();
         for (ConsumerRecord<String, String> data : datas) {
             try {
                 Map datamap = mapper.readValue(data.value(), Map.class);
                 if (topicName.equals("openeuler_statewall_ci_obs_build_status_summary")) {
                     bulkProcess.add(new IndexRequest(esindex).id(datamap.get("ctime_date").toString() + datamap.get("project").toString() + datamap.get("hostarch")).source(datamap));
+                } else if (groupId.equals("QualityDashboard_obs_api")) {
+                    String packagename = datamap.get("package").toString();
+                    String hostarch = datamap.get("hostarch").toString();
+                    String project = datamap.get("project").toString();
+                    System.out.println("bulk add 1");
+                    bulkProcess.add(new IndexRequest(esindex).id(String.format("%s_%s_%s", packagename, hostarch, project)).source(datamap));
                 } else {
                     //更新以前旧数据
                     if ("succeeded".equals(datamap.get("code").toString())) {
