@@ -26,32 +26,40 @@ public class UserPermissionApply extends Parent implements CommonInterface {
     private static ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public void run() {
-        String esIndex = this.esIndex;
+    public void run() {        
         for (KafkaConsumer customer : this.KafkaConsumerList) {
-            Runnable task = () -> {
-                while (true) {
-                    ConsumerRecords<String, String> poll = customer.poll(Duration.ofSeconds(2));
-                    List<Map> reList = dealData(poll);
-                    for (Map map : reList) {
-                        String id = (String) map.get("username");
-                        String community = (String) map.get("community");
-                        try {
-                            EsClientUtils2.insertOrUpdate(community + esIndex, id, map);
-                        } catch (IOException e) {
-                            try {
-                                logger.error(e + ":" + objectMapper.writeValueAsString(map), e);
-                            } catch (JsonProcessingException jsonProcessingException) {
-                                jsonProcessingException.printStackTrace();
-                                logger.error(jsonProcessingException + ":" + map, jsonProcessingException);
-                            }
-                        }
-                    }
-                    EsClientUtils2.getBulkProcess().flush();
-                    customer.commitSync();
-                }
-            };
+            String esIndex = this.esIndex;
+            Runnable task = getTask(customer, esIndex);
             this.thread_pool.execute(task);
+        }
+    }
+
+    public Runnable getTask(KafkaConsumer customer, String esIndex){      
+        return () -> {
+            while (true) {
+                ConsumerRecords<String, String> poll = customer.poll(Duration.ofSeconds(2));
+                List<Map> reList = dealData(poll);
+                for (Map map : reList) {
+                    putInfo(map, esIndex);
+                }
+                EsClientUtils2.getBulkProcess().flush();
+                customer.commitSync();
+            }
+        };
+    }
+
+    public void putInfo(Map map, String esIndex){
+        String id = (String) map.get("username");
+        String community = (String) map.get("community");
+        try {
+            EsClientUtils2.insertOrUpdate(community + esIndex, id, map);
+        } catch (IOException e) {
+            try {
+                logger.error(e + ":" + objectMapper.writeValueAsString(map), e);
+            } catch (JsonProcessingException jsonProcessingException) {
+                jsonProcessingException.printStackTrace();
+                logger.error(jsonProcessingException + ":" + map, jsonProcessingException);
+            }
         }
     }
 
