@@ -18,7 +18,7 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
-import org.elasticsearch.core.TimeValue;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.UpdateByQueryRequest;
@@ -36,7 +36,7 @@ import java.util.Map;
  * @description:
  */
 public class EsClientUtils2 {
-    private static Logger logger = LogManager.getLogger(QualityObs.class);
+    private static Logger logger = LogManager.getLogger(EsClientUtils2.class);
     private static BulkProcessor build = null;
     private static RestHighLevelClient client = null;
     private static CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -55,19 +55,16 @@ public class EsClientUtils2 {
             @Override
             public void beforeBulk(long executionId, BulkRequest request) {
                 logger.info(String.format("before push  %s request", request.numberOfActions()));
-                System.out.println(String.format("before push  %s request", request.numberOfActions()));
             }
 
             @Override
             public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
                 logger.info(String.format("after push  %s request", request.numberOfActions()));
-                System.out.println(String.format("after push  %s request", request.numberOfActions()));
             }
 
             @Override
             public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
-                logger.info(String.format("error push  %s request", request.numberOfActions()));
-                System.out.println(String.format("error push  %s request", request.numberOfActions()));
+                logger.info(String.format("error push  %s request, , error msg: %s", request.numberOfActions(), failure.getMessage()));
             }
         };
         return listener;

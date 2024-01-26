@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 public class UserPermissionApply extends Parent implements CommonInterface {
-    private static Logger logger = LogManager.getLogger(QualitySoftWare.class);
+    private static Logger logger = LogManager.getLogger(UserPermissionApply.class);
 
     public UserPermissionApply() throws IOException {
     }
