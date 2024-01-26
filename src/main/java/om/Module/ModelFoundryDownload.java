@@ -75,10 +75,11 @@ public class ModelFoundryDownload extends Parent implements CommonInterface {
                 for (String details_key : details.keySet()) {
                     resMap.put(details_key, details.get(details_key));            
                 }
+                resMap.put("is_" + resMap.get("type").toString(), 1);
                 String seconds = resMap.get("created_at").toString();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");  
                 String create_at = sdf.format(new Date(Long.valueOf(seconds+"000")));
-                resMap.put("created_at", create_at);              
+                resMap.put("created_at", create_at);
 
                 String doc_id = resMap.get("request_ID").toString();
                 EsClientUtils2.insertOrUpdate(this.esIndex, doc_id, resMap);
