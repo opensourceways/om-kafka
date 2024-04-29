@@ -1,9 +1,8 @@
-package om.Module;
+package om.Module.openMind;
 
 import CommonClass.CommonInterface;
-import CommonClass.Parent;
+import CommonClass.OpenMindParent;
 import Utils.EsClientUtils2;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -21,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ModelFoundryDownload extends Parent implements CommonInterface {
+public class ModelFoundryDownload extends OpenMindParent implements CommonInterface {
     private static Logger logger = LogManager.getLogger(ModelFoundryDownload.class);
 
     public ModelFoundryDownload() throws IOException {
@@ -31,25 +30,11 @@ public class ModelFoundryDownload extends Parent implements CommonInterface {
 
     @Override
     public void run() {
-        String esIndex = this.esIndex;
         for (KafkaConsumer customer : this.KafkaConsumerList) {
             Runnable task = () -> {
                 while (true) {
                     ConsumerRecords<String, String> poll = customer.poll(Duration.ofSeconds(2));
-                    List<Map> reList = dealData(poll);
-                    for (Map map : reList) {
-                        String id = (String) map.get("request_ID");
-                        try {
-                            EsClientUtils2.insertOrUpdate(esIndex, id, map);
-                        } catch (IOException e) {
-                            try {
-                                logger.error(e + ":" + objectMapper.writeValueAsString(map), e);
-                            } catch (JsonProcessingException jsonProcessingException) {
-                                jsonProcessingException.printStackTrace();
-                                logger.error(jsonProcessingException + ":" + map, jsonProcessingException);
-                            }
-                        }
-                    }
+                    dealData(poll);
                     EsClientUtils2.getBulkProcess().flush();
                     customer.commitSync();
                 }
