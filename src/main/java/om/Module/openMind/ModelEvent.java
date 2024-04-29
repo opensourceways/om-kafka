@@ -1,7 +1,7 @@
 package om.Module.openMind;
 
 import CommonClass.CommonInterface;
-import CommonClass.Parent;
+import CommonClass.OpenMindParent;
 import Utils.EsClientUtils2;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ModelEvent extends Parent implements CommonInterface {
+public class ModelEvent extends OpenMindParent implements CommonInterface {
     private static Logger logger = LogManager.getLogger(ModelEvent.class);
 
     public ModelEvent() throws IOException {
