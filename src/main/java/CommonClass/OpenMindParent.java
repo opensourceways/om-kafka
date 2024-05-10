@@ -1,5 +1,6 @@
 package CommonClass;
 
+import Utils.EsClientUtils2;
 import Utils.PropertiesUtils;
 
 import org.apache.kafka.clients.admin.AdminClient;
@@ -10,6 +11,10 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.TopicPartitionInfo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.script.Script;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,6 +60,27 @@ public class OpenMindParent extends Thread {
 
         } catch (Exception e) {
             logger.error("OpenMindParent init exception", e);
+        }
+    }
+
+    public void updateSatus(String topic, String field, String termId) {
+        TermQueryBuilder termQueryBuilder = new TermQueryBuilder(field, termId);
+        BoolQueryBuilder must = QueryBuilders.boolQuery().must(termQueryBuilder);
+        Script script = new Script("ctx._source['is_" + topic + "'] = 1");
+        try {
+            EsClientUtils2.updateByQuery(this.esIndex, must, script);
+        } catch (Exception e) {
+            logger.error("updateSatus exception", e);
+        }
+    }
+
+    public void updateSatusAll(List<Map> updateList) {
+        for (Map resMap : updateList) {
+            String topic = resMap.get("event_type").toString();
+            String field = topic.split("_")[0];
+            String fieldName = field + "_id";
+            String repoId = resMap.get(fieldName).toString();
+            updateSatus(topic, fieldName + ".keyword", repoId);
         }
     }
 }

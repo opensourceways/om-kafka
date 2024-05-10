@@ -159,13 +159,15 @@ public class EsClientUtils2 {
         sc.init(null, new TrustManager[]{trustManager}, null);
         return sc;
     }
-    public static void updateByQuery(String index, QueryBuilder queryBuilder,Script script) throws IOException {
-        //更新以前旧数据
-
-            UpdateByQueryRequest updateByQueryRequest = new UpdateByQueryRequest(index);
-            updateByQueryRequest.setQuery(queryBuilder);
-            updateByQueryRequest.setScript(script);
+    public static void updateByQuery(String index, QueryBuilder queryBuilder,Script script) {
+        UpdateByQueryRequest updateByQueryRequest = new UpdateByQueryRequest(index);
+        updateByQueryRequest.setQuery(queryBuilder);
+        updateByQueryRequest.setScript(script);
+        try {
             BulkByScrollResponse updateResponse = getClient().updateByQuery(updateByQueryRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            logger.error("update exception:", e);
+        }
     }
 
 }
