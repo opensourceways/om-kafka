@@ -9,7 +9,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -19,11 +18,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
-public class ModelFoundryDownload extends OpenMindParent implements CommonInterface {
-    private static Logger logger = LogManager.getLogger(ModelFoundryDownload.class);
+public class SpaceEvent extends OpenMindParent implements CommonInterface {
+    private static Logger logger = LogManager.getLogger(SpaceEvent.class);
 
-    public ModelFoundryDownload() throws IOException {
+    public SpaceEvent() throws IOException {
     }
 
     private static ObjectMapper objectMapper = new ObjectMapper();
@@ -34,8 +36,10 @@ public class ModelFoundryDownload extends OpenMindParent implements CommonInterf
             Runnable task = () -> {
                 while (true) {
                     ConsumerRecords<String, String> poll = customer.poll(Duration.ofSeconds(2));
-                    dealData(poll);
+                    List<Map> updateList = dealData(poll);
                     EsClientUtils2.getBulkProcess().flush();
+                    ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+                    scheduler.schedule(() -> updateSatusAll(updateList), 10, TimeUnit.SECONDS);
                     customer.commitSync();
                 }
             };
@@ -43,10 +47,13 @@ public class ModelFoundryDownload extends OpenMindParent implements CommonInterf
         }
     }
 
+    // {"time":1714977117,"owner":"wqh","space_id":"20241","created_by":"wqh"}
+    // {"space_id":"20236","deleted_by":"wqh"}
     @Override
     public List<Map> dealData(ConsumerRecords<String, String> records) {
         ArrayList<Map> resutList = new ArrayList<>();
         for (ConsumerRecord<String, String> record : records) {
+            String topic = record.topic();
             String value = record.value();
             try {
                 HashMap<String, Object> resMap = objectMapper.readValue(value, HashMap.class);
@@ -54,19 +61,25 @@ public class ModelFoundryDownload extends OpenMindParent implements CommonInterf
                 byte[] decodedBytes = Base64.getDecoder().decode(body);
                 String decodedString = new String(decodedBytes);
                 resMap = objectMapper.readValue(decodedString, HashMap.class);
+                System.out.println(decodedString);
                 resMap.put("offset", record.offset());
                 resMap.put("partition", record.partition());
-                HashMap<String, Object> details = (HashMap<String, Object>) resMap.remove("details");
-                for (String details_key : details.keySet()) {
-                    resMap.put(details_key, details.get(details_key));
-                }
-                resMap.put("is_" + resMap.get("type").toString(), 1);
-                String seconds = resMap.get("created_at").toString();
+                String seconds = resMap.get("time").toString();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
                 String create_at = sdf.format(new Date(Long.valueOf(seconds + "000")));
                 resMap.put("created_at", create_at);
-
-                String doc_id = resMap.get("request_ID").toString();
+                resMap.put("event_type", topic);
+                if (topic.equals("space_create")) {
+                    resMap.put("is_space_created", 1);
+                } else if (topic.equals("space_updated") || topic.equals("space_deleted")) {
+                    resMap.put("topic", topic);
+                    resutList.add(resMap);
+                } else if (topic.equals("like_create") || topic.equals("like_delete")) {
+                    if (resMap.get("repo_type").equals("space") && resMap.containsKey("repo_id")) {
+                        resMap.put("space_id", resMap.get("repo_id"));
+                    }
+                }
+                String doc_id = resMap.get("space_id").toString() + topic + create_at;
                 EsClientUtils2.insertOrUpdate(this.esIndex, doc_id, resMap);
             } catch (Exception e) {
                 logger.error(e.getMessage() + ":" + value, e);
@@ -75,4 +88,5 @@ public class ModelFoundryDownload extends OpenMindParent implements CommonInterf
         return resutList;
 
     }
+
 }
