@@ -15,11 +15,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class SpaceEvent extends OpenMindParent implements CommonInterface {
-    private static Logger logger = LogManager.getLogger(SpaceEvent.class);
+public class DatasetEvent extends OpenMindParent implements CommonInterface {
+    private static Logger logger = LogManager.getLogger(ModelEvent.class);
 
-    public SpaceEvent() throws IOException {
+    public DatasetEvent() throws IOException {
     }
+
 
     @Override
     public void run() {
@@ -40,9 +41,8 @@ public class SpaceEvent extends OpenMindParent implements CommonInterface {
 
     @Override
     public List<Map> dealData(ConsumerRecords<String, String> records) {
-        List<Map> resutList = eventAction(records, "space");
+        List<Map> resutList = eventAction(records, "dataset");
         return resutList;
 
     }
-
 }
