@@ -46,7 +46,6 @@ public class OpenMindParent extends Thread {
 
     public OpenMindParent() throws IOException {
         String[] topics = properties.get("kafka.topic.name").toString().split(",");
-        KafkaConsumer<String, String> kafkacustomer = new KafkaConsumer<String, String>(properties);
         AdminClient adminClient = AdminClient.create(properties);
         for (String topic : topics) {
             try {
@@ -57,6 +56,7 @@ public class OpenMindParent extends Thread {
                 TopicDescription description = topicDescription.get();
                 List<TopicPartitionInfo> partitions = description.partitions();
                 List<TopicPartition> topicPartitions = new ArrayList<>();
+                KafkaConsumer<String, String> kafkacustomer = new KafkaConsumer<String, String>(properties);
                 for (TopicPartitionInfo partition : partitions) {
                     topicPartitions.add(new TopicPartition(topic, partition.partition()));
                     logger.info("topic: " + topic + ", partition: " + partition.partition());
