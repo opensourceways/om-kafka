@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ModelEvent extends OpenMindParent implements CommonInterface {
     private static Logger logger = LogManager.getLogger(ModelEvent.class);
+    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     public ModelEvent() throws IOException {
     }
@@ -29,8 +30,13 @@ public class ModelEvent extends OpenMindParent implements CommonInterface {
                     ConsumerRecords<String, String> poll = customer.poll(Duration.ofSeconds(2));
                     List<Map> updateList = dealData(poll);
                     EsClientUtils2.getBulkProcess().flush();
-                    ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-                    scheduler.schedule(() -> updateSatusAll(updateList), 10, TimeUnit.SECONDS);
+                    scheduler.schedule(() -> {
+                        try {
+                            updateSatusAll(updateList);
+                        } finally {
+                        }
+                    }, 10, TimeUnit.SECONDS);
+                    customer.commitSync();
                     customer.commitSync();
                 }
             };
