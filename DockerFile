@@ -3,6 +3,7 @@ FROM openjdk:8-jdk
 RUN mkdir -p /var/lib/om-kafka
 
 WORKDIR /var/lib/om-kafka
+COPY . /var/lib/om-kafka
 
 # Install basic software support
 RUN apt-get update && \
@@ -15,11 +16,10 @@ ENV MAVEN_HOEM=/var/lib/om-kafka/apache-maven-3.8.8
 
 ENV PATH=$MAVEN_HOEM/bin:$PATH
 
-MAINTAINER zhongjun <jun.zhongjun2@gmail.com>
+RUN mvn clean install assembly:single  -Dmaven.test.skip && \
+    mv ./target/omkafka-1.0-SNAPSHOT.jar ./om-kafka.jar
 
-RUN git clone https://gitee.com/opensourceway/om-kafka.git && \
-        cd om-kafka && \
-        mvn clean install assembly:single  -Dmaven.test.skip && \
-        mv ./target/omkafka-1.0-SNAPSHOT.jar ../om-kafka.jar
+RUN useradd -u 1000 omkafka -s /bin/bash -m -U
 
+USER omkafka
 CMD java -jar om-kafka.jar
