@@ -19,8 +19,8 @@ import com.obs.services.model.ObjectMetadata;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 public class OneIdUserLog extends Parent implements CommonInterface {
-    private static final Logger logger = LogManager.getLogger(QualitySoftWare.class);
+    private static final Logger logger = LoggerFactory.getLogger(OneIdUserLog.class);
     private static ObsClient obsClient = null;
 
     public OneIdUserLog() throws IOException {

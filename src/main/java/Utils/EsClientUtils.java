@@ -1,8 +1,7 @@
 package Utils;
 
 import om.QualityObs;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import org.elasticsearch.action.bulk.BackoffPolicy;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -12,6 +11,8 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.ByteSizeUnit;
 import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -26,7 +27,7 @@ import java.security.cert.CertificateException;
  * @description:
  */
 public class EsClientUtils {
-    private static Logger logger=  LogManager.getLogger(QualityObs.class);
+    private static Logger logger=  LoggerFactory.getLogger(EsClientUtils.class);
     public static BulkProcessor.Listener getBulkListener(){
 
         BulkProcessor.Listener listener = new BulkProcessor.Listener() {
