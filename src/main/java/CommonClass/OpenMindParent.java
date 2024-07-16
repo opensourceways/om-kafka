@@ -12,12 +12,12 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.TopicPartitionInfo;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.script.Script;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -36,7 +36,7 @@ import java.util.concurrent.Executors;
 
 
 public class OpenMindParent extends Thread {
-    private static Logger logger = LogManager.getLogger(OpenMindParent.class);
+    private static Logger logger = LoggerFactory.getLogger(OpenMindParent.class);
     protected Properties properties = PropertiesUtils.readProperties();
     protected ArrayList<KafkaConsumer<String, String>> KafkaConsumerList = new ArrayList<>();
     protected String esIndex = properties.getProperty("es.index");

@@ -1,10 +1,6 @@
 package test;
 
-import om.Customer;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.logging.log4j.LogManager;
-
 import java.util.Properties;
 
 /**

@@ -4,9 +4,9 @@ import Utils.PropertiesUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +19,7 @@ import java.util.*;
  * @description:
  */
 public class QualityObs extends Thread {
-    private static Logger logger = LogManager.getLogger(QualityObs.class);
+    private static Logger logger = LoggerFactory.getLogger(QualityObs.class);
     static Properties conf;
     static KafkaConsumer<String, String> kafkacustomer;
     public static RestHighLevelClient client;
@@ -56,7 +56,7 @@ public class QualityObs extends Thread {
             String partitionnum = stringStringEntry.getKey();
             String offset = stringStringEntry.getValue();
             TopicPartition topicPartition = new TopicPartition(conf.getProperty("kafka.topic.name").toString(), Integer.parseInt(partitionnum));
-            Customer customer = new Customer(topicPartition, conf, topicPartition.toString(), Integer.parseInt(offset),LogManager.getLogger("offset"+partitionnum), conf.getProperty("kafka.topic.name"));
+            Customer customer = new Customer(topicPartition, conf, topicPartition.toString(), Integer.parseInt(offset),LoggerFactory.getLogger("offset"+partitionnum), conf.getProperty("kafka.topic.name"));
             customer.start();
             customerThreads.add(customer);
 
