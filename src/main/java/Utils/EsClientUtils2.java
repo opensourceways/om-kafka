@@ -5,9 +5,8 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.bulk.BackoffPolicy;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -23,6 +22,8 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.UpdateByQueryRequest;
 import org.elasticsearch.script.Script;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
 import java.io.IOException;
@@ -36,7 +37,7 @@ import java.util.Map;
  * @description:
  */
 public class EsClientUtils2 {
-    private static Logger logger = LogManager.getLogger(EsClientUtils2.class);
+    private static Logger logger = LoggerFactory.getLogger(EsClientUtils2.class);
     private static BulkProcessor build = null;
     private static RestHighLevelClient client = null;
     private static CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
@@ -121,7 +122,7 @@ public class EsClientUtils2 {
         UpdateRequest updateRequest = new UpdateRequest(index, id);
         Object offset = data.remove("offset");
         Object partition = data.remove("partition");
-        Logger logger = LogManager.getLogger("offset" + partition);
+        Logger logger = LoggerFactory.getLogger("offset" + partition);
         logger.info("partation:"+partition+":offset:"+offset);
         updateRequest.doc(data);
         updateRequest.upsert(data);

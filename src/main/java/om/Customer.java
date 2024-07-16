@@ -13,8 +13,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
@@ -25,6 +23,8 @@ import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.UpdateByQueryRequest;
 import org.elasticsearch.script.Script;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class Customer extends Thread {
     private Properties conf;
     private KafkaConsumer kafkaConsumer;
     private CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-    private Logger logger = LogManager.getLogger(QualityObs.class);
+    private Logger logger = LoggerFactory.getLogger(Customer.class);
     private Logger loggeroffset;
     private RestHighLevelClient client;
     private String esindex;

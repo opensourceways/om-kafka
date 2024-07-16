@@ -10,12 +10,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.script.Script;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
  */
 public class Openeuler_statewall_dbt extends Parent implements CommonInterface {
 
-    private static Logger logger = LogManager.getLogger(QualitySoftWare.class);
+    private static Logger logger = LoggerFactory.getLogger(Openeuler_statewall_dbt.class);
     public static Map<String, LocalDateTime> dateMap = new HashMap<>();
     public static final String accessKey = "access_key";
     public static final String commentKey = "comment_key";
