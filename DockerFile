@@ -1,13 +1,26 @@
-FROM openjdk:8-jdk
+FROM openeuler/openeuler:22.03
 
 RUN mkdir -p /var/lib/om-kafka
 
 WORKDIR /var/lib/om-kafka
-COPY . /var/lib/om-kafka
 
-# Install basic software support
-RUN apt-get update && \
-    apt-get install --yes software-properties-common
+RUN yum install -y wget \
+    && wget https://mirrors-i.tuna.tsinghua.edu.cn/Adoptium/17/jdk/x64/linux/OpenJDK17U-jdk_x64_linux_hotspot_17.0.12_7.tar.gz \
+    && tar -zxvf OpenJDK17U-jdk_x64_linux_hotspot_17.0.12_7.tar.gz \
+    && wget https://mirrors.tuna.tsinghua.edu.cn/apache/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.tar.gz \
+    && tar -xzvf apache-maven-3.8.8-bin.tar.gz \
+    && yum install -y git
+
+ENV JAVA_HOME=/var/lib/om-kafka/jdk-17.0.12+7
+ENV PATH=${JAVA_HOME}/bin:$PATH
+
+ENV MAVEN_HOEM=/var/lib/om-kafka/apache-maven-3.8.8
+ENV PATH=$MAVEN_HOEM/bin:$PATH
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
+WORKDIR /var/lib/om-kafka
+COPY . /var/lib/om-kafka
 
 RUN wget https://mirror-hk.koddos.net/apache/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.tar.gz && \
         tar -xzvf apache-maven-3.8.8-bin.tar.gz
