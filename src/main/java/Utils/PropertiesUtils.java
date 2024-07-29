@@ -16,7 +16,7 @@ public class PropertiesUtils {
         synchronized (Properties.class){
             if(properties==null){
                 properties=new Properties();
-                InputStream resourceAsStream = new FileInputStream(System.getProperty("user.dir") +"/conf.properties");
+                InputStream resourceAsStream = new FileInputStream(System.getenv("CONFIG_PATH"));
                 properties.load(resourceAsStream);
             }
         }
