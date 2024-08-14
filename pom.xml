@@ -78,37 +78,38 @@
       <artifactId>log4j-core</artifactId>
       <version>2.17.1</version>
     </dependency>
-      <!-- OBS -->
-      <dependency>
-          <groupId>com.huaweicloud</groupId>
-          <artifactId>esdk-obs-java-bundle</artifactId>
-          <version>3.21.8</version>
-      </dependency>
-      <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
-      <dependency>
-          <groupId>org.yaml</groupId>
-          <artifactId>snakeyaml</artifactId>
-          <version>2.2</version>
-      </dependency>
+    <!-- OBS -->
+    <dependency>
+      <groupId>com.huaweicloud</groupId>
+      <artifactId>esdk-obs-java-bundle</artifactId>
+      <version>3.21.8</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>2.2</version>
+    </dependency>
 
-      <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
-      <dependency>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpclient</artifactId>
-          <version>4.5.14</version>
-      </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.5.14</version>
+    </dependency>
 
-      <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-cbor -->
-      <dependency>
-          <groupId>com.fasterxml.jackson.dataformat</groupId>
-          <artifactId>jackson-dataformat-cbor</artifactId>
-          <version>2.17.2</version>
-      </dependency>
+    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-cbor -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-cbor</artifactId>
+      <version>2.17.2</version>
+    </dependency>
 
-
-
-
-
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.11</version>
+    </dependency>
     <!-- further dependency entries here -->
 
   </dependencies>
