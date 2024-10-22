@@ -39,7 +39,6 @@ public class DatasetEvent extends OpenMindParent implements CommonInterface {
                         }
                     }, 10, TimeUnit.SECONDS);
                     customer.commitSync();
-                    customer.commitSync();
                 }
             };
             this.thread_pool.execute(task);
