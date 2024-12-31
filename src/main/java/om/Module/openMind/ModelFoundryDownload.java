@@ -67,6 +67,9 @@ public class ModelFoundryDownload extends OpenMindParent implements CommonInterf
                 resMap.put("created_at", create_at);
 
                 String doc_id = resMap.get("request_ID").toString();
+                if (doc_id == null || doc_id == "" ) {
+                    doc_id = UUID.randomUUID().toString();
+                }
                 EsClientUtils2.insertOrUpdate(this.esIndex, doc_id, resMap);
             } catch (Exception e) {
                 logger.error(e.getMessage() + ":" + value, e);
